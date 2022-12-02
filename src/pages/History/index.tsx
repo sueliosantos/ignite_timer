@@ -1,6 +1,10 @@
+import { useContext } from "react"
+import { CyclesContext } from "../../context/CycleContext"
 import { HistoryContainer, HistoryList, Status } from "./styles"
-
+import { formatDistanceToNow } from "date-fns"
+import ptBR from "date-fns/locale/pt-BR"
 export function History() {
+  const { cycles } = useContext(CyclesContext)
   return (
     <HistoryContainer>
       <h1>Meu histórico</h1>
@@ -16,35 +20,28 @@ export function History() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Tarefa</td>
-              <td>20 min</td>
-              <td>Há 2 meses</td>
-              <td>
-                <Status statusColor="green">Concluido</Status>
-              </td>
-            </tr>
-            <tr>
-              <td>Tarefa</td>
-              <td>20 min</td>
-              <td>Há 2 meses</td>
-              <td>
-                <Status statusColor="yellow">Em andamento</Status>
-              </td>
-            </tr>
-            <tr>
-              <td>Tarefa</td>
-              <td>20 min</td>
-              <td>Há 2 meses</td>
-              <td>
-                <Status statusColor="red">Finalizado</Status>
-              </td>
-            </tr>
+            {cycles.map(cycle => {
+              return (
+                <tr key={cycle.id}>
+                  <td>{cycle.task}</td>
+                  <td>{cycle.minutes} minutos</td>
+                  <td>{formatDistanceToNow(cycle.startData, { addSuffix: true, locale: ptBR })}</td>
+                  <td>
+                    {cycle.finishedDate && (<Status statusColor="green" > Concluído</Status>)}
 
+                    {cycle.interruptedDate && (<Status statusColor="red" > Interrompido</Status>)}
+
+                    {(!cycle.interruptedDate && !cycle.finishedDate) && (<Status statusColor="yellow" > Em andamento</Status>)}
+                  </td>
+                </tr>
+              )
+            }
+            )
+            }
           </tbody>
 
         </table>
       </HistoryList>
-    </HistoryContainer>
+    </HistoryContainer >
   )
 }
